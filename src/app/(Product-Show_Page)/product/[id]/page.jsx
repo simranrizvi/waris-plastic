@@ -7,17 +7,19 @@ import { ShoppingCart, Heart, Facebook, Twitter, ShieldCheck, Truck, RefreshCcw 
 import { toast } from "sonner"; // Notification ke liye
 
 export default function ProductDetailPage() {
-  const { id } = useParams();
+const { id } = useParams();
   const { addToCart } = useCart(); // 2. Context se function nikaala
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState("");
   const [quantity, setQuantity] = useState(1);
-
-  useEffect(() => {
+useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`${API_ENDPOINTS.PRODUCTS}/${id}`);
+        // Yahan bhi ID se slug alag karein taake API ko sahi ID mile
+        const actualId = id.includes("-") ? id.split("-")[0] : id;
+        
+        const res = await fetch(`${API_ENDPOINTS.PRODUCTS}/${actualId}`);
         const result = await res.json();
         if (result.success) {
           setProduct(result.data);
@@ -29,7 +31,7 @@ export default function ProductDetailPage() {
         setLoading(false);
       }
     };
-    fetchProduct();
+    if (id) fetchProduct();
   }, [id]);
 
   // 3. Add to Cart Handler

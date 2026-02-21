@@ -48,7 +48,7 @@ export default function ShopByCategory() {
               className="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-100 group cursor-pointer h-full"
             >
               {/* Image Container with Hover Zoom and Overlay */}
-              <div className="relative h-[320px] overflow-hidden">
+              <div className="relative h-[300px] overflow-hidden">
                 <img
                   src={cat.image}
                   alt={cat.title}
@@ -68,7 +68,7 @@ export default function ShopByCategory() {
 
               {/* Title Bar - Waris Red Hover */}
               <div className="p-6 text-center bg-white border-t border-gray-50">
-                <h3 className="text-[#454545] font-black text-lg tracking-wide group-hover:text-[#D61F26] transition-colors uppercase">
+                <h3 className="text-[#454545] font-black text-xl tracking-wide group-hover:text-[#D61F26] transition-colors ">
                   {cat.title}
                 </h3>
               </div>

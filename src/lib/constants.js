@@ -3,7 +3,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_URL || "";
 export const API_ENDPOINTS = {
   LOGIN: `${BASE}/api/auth/callback/credentials`, //
   REGISTER: `${BASE}/api/auth/register`, //
-  PRODUCTS: `${BASE}/api/products`, //
+
 
   // Product Endpoints
   PRODUCTS: "/api/products",

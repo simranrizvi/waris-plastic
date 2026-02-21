@@ -4,7 +4,7 @@ import { Truck, ThumbsUp, Headset, ChevronLeft, ChevronRight } from 'lucide-reac
 
 export default function FeaturesBanner() {
   return (
-    <section className="bg-[#D61F26] py-1.5 max-w-7xl mx-auto relative group overflow-hidden">
+    <section className="bg-[#D61F26] py-1.5 max-w-7xl mx-auto relative group overflow-hidden mt-10 mb-10">
       <div className="flex flex-col md:flex-row items-stretch justify-center min-h-[130px] gap-0">
         
         {/* Left Arrow */}

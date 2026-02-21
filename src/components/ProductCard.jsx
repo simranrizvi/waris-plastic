@@ -1,12 +1,18 @@
 "use client";
 import { ShoppingCart, Heart, Eye } from "lucide-react";
 import Link from "next/link";
-import { useCart } from "@/context/CartContext"; // Cart hook import kiya
+import { useCart } from "@/context/CartContext";
 
 export default function ProductCard({ product }) {
-  const { addToCart } = useCart(); // addToCart function nikaala
+  const { addToCart } = useCart();
 
-  // Discount percentage calculate karne ke liye logic
+  // 1. Professional URL Helper: ID-product-name format
+  // Isse URL banega: /product/67b867-next-js-pro-t-shirt
+  const productSlug = `${product._id}-${product.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-') // Special characters ko dash se badal dega
+    .replace(/^-+|-+$/g, '')}`;  // Shuru aur aakhir ke faltu dashes khatam
+
   const discount = product.oldPrice 
     ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100) 
     : null;
@@ -34,7 +40,9 @@ export default function ProductCard({ product }) {
           <button className="bg-white p-2 rounded-full text-[#2E3192] hover:bg-[#2E3192] hover:text-white transition-colors">
             <Heart size={18} />
           </button>
-          <Link href={`/product/${product._id}`} className="bg-white p-2 rounded-full text-[#2E3192] hover:bg-[#2E3192] hover:text-white transition-colors">
+          
+          {/* Eye Icon Link Updated ✅ */}
+          <Link href={`/product/${productSlug}`} className="bg-white p-2 rounded-full text-[#2E3192] hover:bg-[#2E3192] hover:text-white transition-colors">
             <Eye size={18} />
           </Link>
         </div>
@@ -45,9 +53,13 @@ export default function ProductCard({ product }) {
         <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-1">
           {product.category}
         </p>
-        <h3 className="text-[14px] font-bold text-gray-800 truncate mb-2 group-hover:text-[#2E3192]">
-          {product.name}
-        </h3>
+        
+        {/* Title Link Updated ✅ */}
+        <Link href={`/product/${productSlug}`}>
+          <h3 className="text-[14px] font-bold text-gray-800 truncate mb-2 group-hover:text-[#2E3192] cursor-pointer">
+            {product.name}
+          </h3>
+        </Link>
         
         <div className="flex items-center justify-center gap-3 mb-4">
           <span className="text-[#2E3192] font-bold text-[16px]">
@@ -60,9 +72,9 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        {/* 4. Updated Add to Cart Button */}
+        {/* 4. Add to Cart Button */}
         <button 
-          onClick={() => addToCart(product)} // Ab ye login aur non-login dono ko handle karega
+          onClick={() => addToCart(product)}
           className="w-full flex items-center justify-center gap-2 bg-[#2E3192] text-white py-2 text-[12px] font-bold uppercase tracking-wider hover:bg-blue-900 transition-colors rounded-sm shadow-md active:scale-95 duration-150"
         >
           <ShoppingCart size={16} />
