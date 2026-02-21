@@ -8,7 +8,7 @@ export default function ShopByCategory() {
   const categories = [
     {
       id: 1,
-      title: "Moulded Chairs",
+      title: "Office",
       image: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?q=80&w=1000&auto=format&fit=crop",
       tagline: "SIT IN ENCHANTED COMFORT",
     },
