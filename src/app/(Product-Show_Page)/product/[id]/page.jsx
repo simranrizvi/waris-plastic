@@ -1,24 +1,24 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { useCart } from "@/context/CartContext"; // 1. Context import kiya
+import { useParams, useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 import { API_ENDPOINTS } from "@/lib/constants";
-import { ShoppingCart, Heart, Facebook, Twitter, ShieldCheck, Truck, RefreshCcw } from "lucide-react";
-import { toast } from "sonner"; // Notification ke liye
+import { ShoppingCart, Heart, Facebook, Twitter, PinIcon as Pinterest, Loader2, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ProductDetailPage() {
-const { id } = useParams();
-  const { addToCart } = useCart(); // 2. Context se function nikaala
+  const { id } = useParams();
+  const router = useRouter();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState("");
   const [quantity, setQuantity] = useState(1);
-useEffect(() => {
+
+  useEffect(() => {
     const fetchProduct = async () => {
       try {
-        // Yahan bhi ID se slug alag karein taake API ko sahi ID mile
         const actualId = id.includes("-") ? id.split("-")[0] : id;
-        
         const res = await fetch(`${API_ENDPOINTS.PRODUCTS}/${actualId}`);
         const result = await res.json();
         if (result.success) {
@@ -34,114 +34,174 @@ useEffect(() => {
     if (id) fetchProduct();
   }, [id]);
 
-  // 3. Add to Cart Handler
-  const handleAddToCart = () => {
-    if (product) {
-      // Hum poora product object aur selected quantity bhej rahe hain
-      addToCart({ 
-        ...product, 
-        quantity: Number(quantity) 
-      });
-      
-      // Professional feel ke liye ek toast notification
-      toast.success(`${product.name} cart mein add ho gaya!`);
-    }
-  };
+ const handleAddToCart = () => {
+  if (product) {
+    addToCart({ ...product, quantity: Number(quantity) });
 
-  if (loading) return <div className="p-20 text-center animate-pulse">Loading Product Details...</div>;
+    toast.success("Successfully added to cart!", {
+      duration: 1500,
+    });
+
+    setTimeout(() => {
+      router.push("/cart");
+    }, 1500);
+  }
+};
+
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <Loader2 className="animate-spin text-[#D61F26]" size={40} />
+    </div>
+  );
+
   if (!product) return <div className="p-20 text-center text-red-500 font-bold">Product not found.</div>;
 
   return (
-    <div className="w-full min-h-screen bg-gray-50 pb-20">
-      {/* 1. Header Banner */}
-      <div className="w-full h-80 bg-gray-900 overflow-hidden flex items-center justify-center relative">
-        <img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=2000" className="absolute w-full h-full object-cover opacity-30 grayscale" />
-        <div className="relative text-center text-white">
-           <h1 className="text-3xl font-black uppercase tracking-widest">{product.name}</h1>
-           <p className="text-sm opacity-80 font-medium tracking-tighter">Home {">"} {product.category} {">"} {product.name}</p>
+    <div className="w-full min-h-screen bg-white pb-20 font-sans">
+      
+      {/* 1. VIP HEADER SECTION (Centered Name Banner) */}
+      <div className="relative w-full h-[200px] md:h-[400px] overflow-hidden flex items-center justify-center">
+  
+  <img 
+    src="https://images.unsplash.com/photo-1699831302264-936de1cd016a?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+    alt="Banner" 
+    className="absolute inset-0 w-full h-full object-cover"
+  />
+
+  {/* Dark Overlay */}
+  <div className="absolute inset-0 bg-black/60"></div>
+        <div className="relative z-10 text-center px-4">
+          <h1 className="text-2xl md:text-4xl lg:text-4xl font-black text-white uppercase tracking-[0.15em] drop-shadow-md mb-4">
+            {product.name}
+          </h1>
+          <div className="flex items-center justify-center gap-3 text-[10px] md:text-[11px] font-bold uppercase tracking-widest bg-black/40 py-2 px-6 rounded-full inline-flex">
+            <span className="text-gray-300 hover:text-white cursor-pointer transition-colors" onClick={() => router.push('/')}>Home</span> 
+            <ChevronRight size={12} className="text-[#D61F26]" /> 
+            <span className="text-[#D61F26]">{product.name}</span>
+          </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 mt-10">
-        <div className="bg-white p-8 shadow-sm border border-gray-100 rounded-sm flex flex-col lg:flex-row gap-12">
+      <div className="max-w-6xl mx-auto px-4 mt-12">
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
           
-          {/* Left Side: Image Gallery */}
-          <div className="w-full lg:w-1/2 space-y-4">
-            <div className="border border-gray-100 p-2 overflow-hidden bg-white">
-              <img src={selectedImage} alt={product.name} className="w-full h-auto object-contain hover:scale-105 transition-transform duration-500" />
+          {/* 2. Image Gallery Section (Image 9 Style) */}
+          <div className="w-full lg:w-[45%]">
+            <div className="border border-gray-100 bg-white p-2">
+              <img 
+                src={selectedImage} 
+                alt={product.name} 
+                className="w-full h-auto object-contain" 
+              />
             </div>
-            {/* Thumbnails */}
-            <div className="flex gap-4 overflow-x-auto pb-2 custom-scrollbar">
-              {product.images?.map((img, idx) => (
-                <div 
-                  key={idx} 
-                  onClick={() => setSelectedImage(img)}
-                  className={`w-24 h-24 border-2 p-1 cursor-pointer transition shrink-0 ${selectedImage === img ? 'border-[#2E3192]' : 'border-gray-100'}`}
-                >
-                  <img src={img} className="w-full h-full object-cover" />
-                </div>
-              ))}
+            {/* Thumbnails with Scroll Arrows logic */}
+            <div className="flex items-center gap-2 mt-4">
+               <button className="text-gray-400 hover:text-black">{"<"}</button>
+               <div className="flex gap-2 overflow-x-hidden">
+                {product.images?.map((img, idx) => (
+                  <div 
+                    key={idx} 
+                    onClick={() => setSelectedImage(img)}
+                    className={`w-24 h-24 border p-1 cursor-pointer transition-all ${selectedImage === img ? 'border-[#2E3192]' : 'border-gray-200'}`}
+                  >
+                    <img src={img} className="w-full h-full object-cover" />
+                  </div>
+                ))}
+               </div>
+               <button className="text-gray-400 hover:text-black">{">"}</button>
             </div>
           </div>
 
-          {/* Right Side: Product Info */}
-          <div className="w-full lg:w-1/2 space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 uppercase tracking-tight">{product.name}</h2>
-              <div className="flex items-center gap-4 mt-2 border-b pb-4">
-                <span className="text-xs text-green-600 font-bold uppercase flex items-center gap-1">
-                   <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div> In Stock
-                </span>
-                <span className="text-xs text-gray-400 font-semibold tracking-widest">Vendor: Saab Pakistan</span>
-              </div>
+          {/* 3. Product Info Section (Exact layout of Image 7/9) */}
+          <div className="w-full lg:w-[55%] space-y-5">
+            <h2 className="text-xl font-bold text-gray-800 uppercase tracking-tight">{product.name}</h2>
+            
+            <div className="flex items-center gap-4 text-[11px] font-bold uppercase">
+              <span className="text-gray-400 italic font-medium">Availability: <span className="text-green-600 not-italic">✔ In stock</span></span>
+              <span className="text-gray-400 italic font-medium">Vendor: <span className="text-gray-600 not-italic">Saab Pakistan</span></span>
             </div>
 
-            <div className="py-2">
-              <span className="text-3xl font-black text-[#ED1C24]">Rs.{product.price?.toLocaleString()}</span>
+            <div className="flex items-baseline gap-3 border-b border-gray-100 pb-4">
+              <span className="text-2xl font-black text-[#D61F26]">Rs.{product.price?.toLocaleString()}</span>
               {product.oldPrice && (
-                <span className="text-gray-400 line-through ml-4 font-medium">Rs.{product.oldPrice?.toLocaleString()}</span>
+                <span className="text-gray-400 line-through text-lg font-medium">Rs.{product.oldPrice?.toLocaleString()}</span>
               )}
             </div>
 
+            {/* Description Tab Header */}
+            <div className="border-b border-gray-200">
+                <span className="inline-block py-2 px-4 bg-white border-t border-x border-gray-200 text-[11px] font-black uppercase text-gray-800 relative top-[1px]">Description</span>
+            </div>
+
             <div className="space-y-4">
-              <p className="text-sm font-bold text-gray-800 uppercase tracking-widest border-b pb-2">Quick Overview:</p>
-              <p className="text-gray-600 text-sm leading-relaxed text-justify">{product.description}</p>
+              <p className="text-[12px] font-black uppercase text-gray-800 tracking-tighter">Quick Overview:</p>
+              <p className="text-gray-500 text-[13px] leading-relaxed text-justify">
+                {product.description || "Saab SP-675 New Full Plastic Indoor and Outdoor Spectrum Patti Chair. Comfortable & graceful..."}
+              </p>
             </div>
 
-            {/* Badges Section */}
-            <div className="flex gap-4 py-4 border-y border-gray-50 justify-between">
-               <div className="flex flex-col items-center gap-1"><Truck size={28} className="text-cyan-500" /><span className="text-[10px] font-bold text-gray-500">SHIPPING</span></div>
-               <div className="flex flex-col items-center gap-1"><RefreshCcw size={28} className="text-cyan-500" /><span className="text-[10px] font-bold text-gray-500">MONEY BACK</span></div>
-               <div className="flex flex-col items-center gap-1"><ShieldCheck size={28} className="text-cyan-500" /><span className="text-[10px] font-bold text-gray-500">QUALITY</span></div>
+            {/* Quality Badges (Exact Circular Style from Image 7) */}
+            <div className="flex gap-4 py-2">
+               {[
+                 { t: "WORLDWIDE", b: "SHIPPING" },
+                 { t: "MONEY BACK", b: "30 DAYS" },
+                 { t: "GUARANTEED", b: "QUALITY" },
+                 { t: "ACCREDITED", b: "BUSINESS" }
+               ].map((badge, i) => (
+                 <div key={i} className="flex flex-col items-center text-center p-3 border-4 border-[#D61F26] rounded-full w-[75px] h-[75px] justify-center bg-white shadow-sm hover:scale-105 transition-transform">
+                   <span className="text-[7px] font-black text-[#1A1A1A] leading-tight uppercase">{badge.t}<br/>{badge.b}</span>
+                 </div>
+               ))}
             </div>
 
-            {/* 4. Controls & Click Action */}
-            <div className="pt-6 space-y-6">
-              <div className="flex items-center gap-4">
-                <div className="flex border border-gray-200 h-14 bg-gray-50">
-                   <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-5 hover:bg-gray-200 font-bold text-xl">-</button>
-                   <input type="text" value={quantity} readOnly className="w-12 text-center border-x font-black bg-white" />
-                   <button onClick={() => setQuantity(quantity + 1)} className="px-5 hover:bg-gray-200 font-bold text-xl">+</button>
+            {/* Spec / Size Info */}
+            <p className="text-lg font-bold text-gray-600 tracking-tight">H33 x W23 x D23.5 (inches)</p>
+
+            {/* Color Selection (Dots like in Image 7) */}
+            <div className="space-y-2">
+                <span className="text-[11px] font-black uppercase text-gray-800">COLOR</span>
+                <div className="flex gap-2">
+                    {["#E5E4E2", "#4B2D1F", "#F5F5DC", "#DEB887", "#D61F26", "#454545", "#FFFFFF"].map((color, i) => (
+                        <div key={i} className={`w-6 h-6 rounded-full border border-gray-300 cursor-pointer hover:scale-110 transition-all ${i === 0 ? 'ring-2 ring-[#D61F26] ring-offset-2' : ''}`} style={{ backgroundColor: color }}></div>
+                    ))}
                 </div>
-                
-                {/* VIP Button: handleAddToCart call kiya */}
-                <button 
-                  onClick={handleAddToCart}
-                  className="flex-1 bg-[#2E3192] text-white h-14 flex items-center justify-center gap-2 font-black uppercase tracking-widest hover:bg-blue-900 transition-all active:scale-95 shadow-lg shadow-blue-900/20"
-                >
-                  <ShoppingCart size={20} strokeWidth={2.5} /> Add to Cart
-                </button>
+            </div>
+
+            {/* Actions Bar (Exact spacing of Image 7) */}
+            <div className="flex items-center gap-4 pt-4">
+              <div className="flex border border-gray-300 h-10 items-center">
+                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 text-gray-400 hover:text-black font-bold border-r h-full">-</button>
+                 <input type="text" value={quantity} readOnly className="w-10 text-center font-bold text-sm outline-none" />
+                 <button onClick={() => setQuantity(quantity + 1)} className="px-3 text-gray-400 hover:text-black font-bold border-l h-full">+</button>
               </div>
               
-              <div className="flex items-center justify-between pt-4 border-t">
-                 <div className="flex items-center gap-4">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Share:</span>
-                    <Facebook size={16} className="text-gray-400 hover:text-blue-600 cursor-pointer transition-colors" />
-                    <Twitter size={16} className="text-gray-400 hover:text-blue-400 cursor-pointer transition-colors" />
-                 </div>
-                 <button className="flex items-center gap-2 text-[10px] font-bold text-gray-400 hover:text-red-500 transition-colors uppercase">
-                    <Heart size={16} /> Add to Wishlist
-                 </button>
+              <button 
+                onClick={handleAddToCart}
+                className="bg-[#D61F26] text-white h-10 px-8 flex items-center justify-center gap-2 font-black uppercase text-[11px] tracking-widestcursor-ponter transition-all active:scale-95"
+              >
+                Add to Cart
+              </button>
+
+              <button className="h-10 w-10 flex items-center justify-center border border-gray-200 text-gray-400 hover:text-red-500 transition-all">
+                <Heart size={18} />
+              </button>
+            </div>
+
+            {/* Share Section */}
+            <div className="pt-6 border-t border-gray-50 space-y-3">
+              <div className="flex items-center gap-4 text-[11px] font-bold text-gray-400 uppercase">
+                <span>Share:</span>
+                <div className="flex gap-4">
+                  <Facebook size={14} className="hover:text-blue-600 cursor-pointer" />
+                  <Pinterest size={14} className="hover:text-red-600 cursor-pointer" />
+                  <Twitter size={14} className="hover:text-cyan-400 cursor-pointer" />
+                </div>
+              </div>
+              <div className="text-[11px] font-bold text-gray-400 uppercase">
+                Category: <span className="text-[#25B7D3] hover:underline cursor-pointer ml-1 font-medium italic underline">Deal of the Year , Full Plastic Chairs With Arms</span>
+              </div>
+              <div className="text-[11px] font-bold text-gray-400 uppercase">
+                Tags: <span className="text-[#25B7D3] hover:underline cursor-pointer ml-1 font-medium italic underline italic">chairs , Dining chair , indoor</span>
               </div>
             </div>
           </div>

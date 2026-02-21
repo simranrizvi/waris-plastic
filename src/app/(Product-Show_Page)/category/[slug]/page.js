@@ -3,34 +3,35 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import { API_ENDPOINTS } from "@/lib/constants"; 
+import { Loader2, ChevronRight, LayoutGrid } from "lucide-react";
 
 export default function CategoryPage() {
   const { slug } = useParams();
   const router = useRouter();
   const [products, setProducts] = useState([]);
   const [dynamicCategories, setDynamicCategories] = useState([]);
-  const [bestSellers, setBestSellers] = useState([]); // Best sellers state
+  const [bestSellers, setBestSellers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        // Category slug logic update: spaces handles
+        const formattedSlug = slug?.replace(/-/g, " ");
 
-        // 1. Current category ke products
-        const prodRes = await fetch(`${API_ENDPOINTS.PRODUCTS}?category=${slug}`);
+        const [prodRes, catRes, bestRes] = await Promise.all([
+          fetch(`${API_ENDPOINTS.PRODUCTS}?category=${formattedSlug}`),
+          fetch(API_ENDPOINTS.CATEGORIES),
+          fetch(`${API_ENDPOINTS.PRODUCTS}?limit=3`)
+        ]);
+
         const prodResult = await prodRes.json();
-        if (prodResult.success) setProducts(prodResult.data);
-
-        // 2. Sidebar Categories aur Count
-        const catRes = await fetch(API_ENDPOINTS.CATEGORIES);
         const catResult = await catRes.json();
-        if (catResult.success) setDynamicCategories(catResult.data);
-
-        // 3. Best Sellers (Puri shop se top 3 products uthana)
-        // Aap backend pe query bhej sakte hain limit=3 and sort=popularity
-        const bestRes = await fetch(`${API_ENDPOINTS.PRODUCTS}?limit=3`);
         const bestResult = await bestRes.json();
+
+        if (prodResult.success) setProducts(prodResult.data);
+        if (catResult.success) setDynamicCategories(catResult.data);
         if (bestResult.success) setBestSellers(bestResult.data.slice(0, 3));
 
       } catch (error) {
@@ -44,50 +45,59 @@ export default function CategoryPage() {
   }, [slug]);
 
   return (
-    <div className="w-full min-h-screen bg-[#f8f8f8]">
+    <div className="w-full min-h-screen bg-[#f3eeee]">
       
-      {/* 1. VIP Banner Section */}
-      <div className="relative w-full h-[250px] md:h-[350px] bg-gray-900 overflow-hidden flex items-center justify-center">
-        <img 
-          src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=2000" 
-          alt="Banner" 
-          className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale" 
-        />
+      {/* 1. WARIS THEME BANNER */}
+      <div className="relative w-full h-[200px] md:h-[400px] overflow-hidden flex items-center justify-center">
+  
+  <img 
+    src="https://images.unsplash.com/photo-1699831302264-936de1cd016a?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+    alt="Banner" 
+    className="absolute inset-0 w-full h-full object-cover"
+  />
+
+  {/* Dark Overlay */}
+  <div className="absolute inset-0 bg-black/60"></div>
         <div className="relative text-center text-white z-10 px-4">
-          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-widest mb-2 drop-shadow-lg">
-            {slug?.replace("-", " ")}
+          <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.2em] mb-3">
+            {slug?.replace(/-/g, " ")}
           </h1>
-          <p className="text-sm md:text-base opacity-90 font-medium">Home {`>`} {slug}</p>
+          <div className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-widest bg-black/30 py-2 px-4 inline-flex">
+            <span className="text-gray-400 hover:text-white cursor-pointer" onClick={() => router.push('/')}>Home</span> 
+            <ChevronRight size={12} className="text-[#D61F26]" /> 
+            <span className="text-[#D61F26]">{slug?.replace(/-/g, " ")}</span>
+          </div>
         </div>
       </div>
 
-      <div className="container mx-auto py-10 px-4">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <div className="container mx-auto py-12  px-4">
+        <div className="flex flex-col lg:flex-row gap-10">
           
-          {/* 2. SIDEBAR SECTION */}
-          <aside className="w-full lg:w-[300px] shrink-0 space-y-8">
+          {/* 2. SIDEBAR SECTION (Waris Styling) */}
+          <aside className="w-full lg:w-[320px] shrink-0 space-y-10">
             
             {/* Categories Widget */}
-            <div className="bg-white shadow-sm border-t-4 border-[#2E3192] rounded-sm">
-              <h2 className="p-5 text-[#2E3192] font-black text-[16px] uppercase border-b flex items-center gap-2">
-                Shop By Category
+            <div className="bg-white border border-gray-100 shadow-sm">
+              <h2 className="p-4 bg-[#454545] text-white font-bold text-[14px] uppercase tracking-widest flex items-center gap-3">
+                <div className="w-1.5 h-4 bg-[#D61F26]"></div>
+                Product Categories
               </h2>
-              <ul className="max-h-[400px] overflow-y-auto p-2 custom-scrollbar">
+              <ul className="p-1">
                 {dynamicCategories.map((cat) => (
                   <li 
                     key={cat._id}
                     onClick={() => router.push(`/category/${cat._id.toLowerCase().trim().replace(/\s+/g, '-')}`)}
-                    className={`flex justify-between items-center p-3 mb-1 cursor-pointer transition-all rounded-sm group
+                    className={`flex justify-between items-center p-3.5 border-b border-gray-50 last:border-none cursor-pointer transition-all group
                       ${slug === cat._id.toLowerCase().replace(/\s+/g, '-') 
-                        ? 'bg-blue-50 text-[#2E3192] font-bold border-l-4 border-[#2E3192]' 
+                        ? 'bg-gray-50 text-[#D61F26]' 
                         : 'text-gray-600 hover:bg-gray-50'}
                     `}
                   >
                     <div className="flex items-center gap-3">
-                      <span className={`text-[10px] ${slug === cat._id.toLowerCase().replace(/\s+/g, '-') ? 'text-[#2E3192]' : 'text-gray-300 group-hover:text-[#2E3192]'}`}>◆</span>
-                      <span className="text-[13px] uppercase tracking-tight">{cat._id}</span>
+                      <span className={`text-[8px] ${slug === cat._id.toLowerCase().replace(/\s+/g, '-') ? 'text-[#D61F26]' : 'text-gray-300 group-hover:text-[#D61F26]'}`}>◆</span>
+                      <span className="text-[12px] font-bold uppercase tracking-tight">{cat._id}</span>
                     </div>
-                    <span className="text-[11px] bg-gray-100 px-2 py-0.5 rounded-full text-gray-400 group-hover:bg-[#2E3192] group-hover:text-white transition-colors font-bold">
+                    <span className={`text-[10px] px-2 py-0.5 font-bold border ${slug === cat._id.toLowerCase().replace(/\s+/g, '-') ? 'bg-[#D61F26] text-white border-[#D61F26]' : 'text-gray-400 border-gray-200 group-hover:text-[#D61F26] group-hover:border-[#D61F26]'}`}>
                       {cat.count}
                     </span>
                   </li>
@@ -95,37 +105,33 @@ export default function CategoryPage() {
               </ul>
             </div>
 
-            {/* Best Sellers Widget (Dynamic) */}
-            <div className="bg-white shadow-sm border-t-4 border-[#2E3192] rounded-sm overflow-hidden">
-              <h2 className="p-4 bg-zinc-800 text-white font-black text-[15px] uppercase text-center tracking-widest">
-                Best Sellers
+            {/* Best Sellers Widget */}
+            <div className="bg-white border border-gray-100 shadow-sm">
+              <h2 className="p-4 bg-[#454545] text-white font-bold text-[14px] uppercase tracking-widest flex items-center gap-3">
+                 <div className="w-1.5 h-4 bg-[#D61F26]"></div>
+                 Top Rated
               </h2>
-              <div className="p-4 space-y-6">
+              <div className="p-5 space-y-6">
                 {bestSellers.map((item) => (
                   <div 
                     key={item._id} 
-                    className="flex gap-4 items-center cursor-pointer group"
-                    onClick={() => router.push(`/product/${item._id}`)}
+                    className="flex gap-4 items-center cursor-pointer group border-b border-gray-50 pb-4 last:border-none last:pb-0"
+                    onClick={() => router.push(`/product/${item._id}-${item.name.toLowerCase().replace(/\s+/g, '-')}`)}
                   >
-                    <div className="w-20 h-20 shrink-0 bg-gray-50 border p-1 rounded-sm overflow-hidden">
+                    <div className="w-20 h-20 shrink-0 bg-gray-50 border border-gray-100 p-1 overflow-hidden">
                       <img 
                         src={item.images?.[0]} 
                         alt={item.name} 
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
                     <div className="flex flex-col">
-                      <h4 className="text-[12px] font-bold text-gray-700 uppercase leading-tight group-hover:text-[#2E3192] line-clamp-2">
+                      <h4 className="text-[11px] font-black text-[#454545] uppercase leading-tight group-hover:text-[#D61F26] line-clamp-2 tracking-tighter">
                         {item.name}
                       </h4>
-                      <p className="text-[#ED1C24] font-black text-[14px] mt-1">
-                        Rs.{item.price.toLocaleString()}
-                      </p>
-                      {item.oldPrice && (
-                        <p className="text-gray-400 line-through text-[11px]">
-                          Rs.{item.oldPrice.toLocaleString()}
-                        </p>
-                      )}
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-[#D61F26] font-bold text-[14px]">Rs.{item.price.toLocaleString()}</span>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -133,34 +139,41 @@ export default function CategoryPage() {
             </div>
           </aside>
 
-          {/* 3. Products Grid Area */}
-          <main className="flex-1">
+          {/* 3. PRODUCTS GRID AREA */}
+          <main className="flex-1 ">
             {/* Sorting Top Bar */}
-            <div className="bg-white p-4 mb-6 shadow-sm flex flex-wrap justify-between items-center border border-gray-100 rounded-sm">
-              <p className="text-sm text-gray-500 font-semibold uppercase tracking-tighter">
-                Found {products.length} Products in {slug}
-              </p>
-              <div className="flex items-center gap-4">
-                 <select className="text-[11px] border p-2 bg-transparent outline-none text-gray-600 font-bold uppercase cursor-pointer">
-                   <option>Sort By: Featured</option>
-                   <option>Price: Low to High</option>
-                   <option>Price: High to Low</option>
-                 </select>
+            <div className="bg-white px-4 py-2 mb-8 border border-gray-100 flex flex-wrap justify-between items-center">
+              <div className="flex items-center gap-2 text-gray-500">
+                <LayoutGrid size={16} />
+                <p className="text-[11px] font-bold uppercase tracking-widest">
+                  Showing {products.length} Results
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-bold uppercase text-gray-400">Sort By:</span>
+                  <select className="text-[11px] border border-gray-200 p-2 bg-transparent outline-none text-[#454545] font-bold uppercase cursor-pointer focus:border-[#D61F26]">
+                    <option>Default Sorting</option>
+                    <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                    <option>Newest Arrivals</option>
+                  </select>
               </div>
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                 {[1,2,3,4,5,6].map(i => (
-                   <div key={i} className="h-[380px] bg-gray-100 animate-pulse rounded-sm border border-gray-200"></div>
-                 ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {[1,2,3,4,5,6].map(i => (
+                    <div key={i} className="h-[400px] bg-gray-100 animate-pulse border border-gray-100"></div>
+                  ))}
               </div>
             ) : products.length === 0 ? (
-              <div className="text-center py-24 bg-white shadow-sm rounded-sm border border-dashed border-gray-200">
-                <p className="text-gray-400 italic text-xl">Is category mein abhi koi products nahi hain.</p>
+              <div className="text-center py-32 bg-white border-2 border-dashed border-gray-100">
+                <div className="text-gray-300 mb-4 flex justify-center"><Loader2 size={48} className="animate-spin" /></div>
+                <p className="text-[#454545] font-bold uppercase tracking-[0.2em]">No Products Found</p>
+                <button onClick={() => router.push('/')} className="mt-6 text-[11px] font-bold text-[#D61F26] border-b-2 border-[#D61F26] pb-1 uppercase">Back to Home</button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {products.map((product) => (
                   <ProductCard key={product._id} product={product} />
                 ))}
