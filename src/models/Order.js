@@ -9,10 +9,13 @@ const OrderSchema = new mongoose.Schema({
       quantity: { type: Number, required: true },
       image: { type: String, required: true },
       price: { type: Number, required: true },
+      color: { type: String },
       product: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
     },
   ],
   shippingAddress: {
+    name: { type: String, required: true },        // Naya Field
+    phone: { type: String, required: true },
     address: { type: String, required: true },
     city: { type: String, required: true },
     postalCode: { type: String, required: true },

@@ -17,7 +17,7 @@ const page = () => {
         {/* Ensure overflow is visible here */}
         <HeroSection />
         {/* Product Showcase Section */}
-        <div className="relative z-10 -mt-32">
+        <div className="md:relative md:z-10 md:-mt-32">
           <ProductShowcase />
         </div>
         <ShopByCategory />

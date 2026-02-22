@@ -8,12 +8,12 @@ export default function Footer() {
       
       {/* 1. Newsletter / Support Bar */}
       <div className="bg-gray-300 py-8 border-b border-gray-200">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-center md:text-left">
+        <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-between gap-6">
+          <div className="text-center lg:text-left">
             <h2 className="text-[#454545] font-bold text-lg md:text-xl uppercase tracking-tighter">
               Need Help? Call Us At
             </h2>
-            <p className="text-gray-500 font-bold text-md mt-1">
+            <p className="text-gray-500 font-bold text-sm md:text-md mt-1">
               SUPPORT TEAM 24/7 AT <span className="text-[#D61F26]">0331-2216249</span>
             </p>
           </div>
@@ -22,9 +22,9 @@ export default function Footer() {
             <input 
               type="email" 
               placeholder="Email address" 
-              className="flex-1 p-3 outline-none text-sm"
+              className="flex-1 p-3 outline-none text-sm w-full"
             />
-            <button className="bg-[#D61F26] text-white px-6 py-3 font-bold uppercase text-xs hover:bg-[#b0191f] transition-colors flex items-center gap-2">
+            <button className="bg-[#D61F26] text-white px-4 md:px-6 py-3 font-bold uppercase text-[10px] md:text-xs hover:bg-[#b0191f] transition-colors flex items-center gap-2 shrink-0">
               Subscribe <Send size={14} />
             </button>
           </div>
@@ -32,12 +32,12 @@ export default function Footer() {
       </div>
 
       {/* 2. Main Footer Links Area */}
-      <div className="bg-[#231F20] text-gray-300 py-16">
-        <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-2">
+      <div className="bg-[#231F20] text-gray-300 py-12 md:py-16">
+        <div className="container mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-2">
           
           {/* Column 1: Resources */}
           <div>
-            <h4 className="text-white font-black uppercase mb-8 border-l-4 border-[#D61F26] pl-3 tracking-widest text-sm">
+            <h4 className="text-white font-black uppercase mb-6 md:mb-8 border-l-4 border-[#D61F26] pl-3 tracking-widest text-sm">
               Resources
             </h4>
             <ul className="space-y-4 text-[13px]">
@@ -51,7 +51,7 @@ export default function Footer() {
 
           {/* Column 2: Company */}
           <div>
-            <h4 className="text-white font-black uppercase mb-8 border-l-4 border-[#D61F26] pl-3 tracking-widest text-sm">
+            <h4 className="text-white font-black uppercase mb-6 md:mb-8 border-l-4 border-[#D61F26] pl-3 tracking-widest text-sm">
               Company
             </h4>
             <ul className="space-y-4 text-[13px]">
@@ -64,8 +64,8 @@ export default function Footer() {
           </div>
 
           {/* Column 3: Let Us Help You */}
-          <div>
-            <h4 className="text-white font-black uppercase mb-8 border-l-4 border-[#D61F26] pl-3 tracking-widest text-sm">
+          <div className="mb-6 md:mb-0">
+            <h4 className="text-white font-black uppercase mb-6 md:mb-8 border-l-4 border-[#D61F26] pl-3 tracking-widest text-sm">
               Let Us Help You
             </h4>
             <ul className="space-y-4 text-[13px]">
@@ -78,7 +78,8 @@ export default function Footer() {
           </div>
 
           {/* Column 4: Contact Us */}
-          <div className="bg-[#D61F26] p-8 text-white -mt-16  shadow-2xl relative overflow-hidden">
+          {/* -mt-16 sirf desktop (md) pe rakha hai */}
+          <div className="bg-[#D61F26] p-8 text-white md:-mt-16 shadow-2xl relative overflow-hidden">
             <h4 className="font-black uppercase mb-6 tracking-widest text-sm border-b border-white/20 pb-2">
               Contact Us
             </h4>
@@ -111,15 +112,12 @@ export default function Footer() {
 
       {/* 3. Bottom Bar */}
       <div className="bg-[#1a1a1a] py-6 border-t border-white/5">
-  <div className="container mx-auto px-4 flex flex-col items-center justify-center gap-4 text-center">
-    
-    <p className="text-gray-500 text-[11px] uppercase tracking-widest">
-      © 2026 <span className="text-gray-300 font-bold">Waris Furniture</span> All Rights Reserved.
-    </p>
-
-
-  </div>
-</div>
+        <div className="container mx-auto px-4 flex flex-col items-center justify-center gap-4 text-center">
+          <p className="text-gray-500 text-[10px] md:text-[11px] uppercase tracking-widest">
+            © 2026 <span className="text-gray-300 font-bold">Waris Plastic</span> All Rights Reserved.
+          </p>
+        </div>
+      </div>
     </footer>
   );
 }

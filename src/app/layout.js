@@ -6,7 +6,7 @@ import AuthProvider from "@/components/AuthProvider"; // NextAuth Session ke liy
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Saab Pakistan | Premium Furniture Store",
+  title: "warisplastic | Premium Furniture Store",
   description: "Modern furniture for home and office",
 };
 
@@ -15,18 +15,14 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="antialiased">
         {/* VIP: Auth aur Cart providers ko yahan wrap karna lazmi hai */}
-        <AuthProvider> 
-          <CartProvider> {/* */}
-            
+        <AuthProvider>
+          <CartProvider>
+            {" "}
+            {/* */}
             <Header />
-            
-            <main className="min-h-screen">
-              {children}
-            </main>
-            <Footer/>
-            
+            <main className="min-h-screen">{children}</main>
+            <Footer />
             <Toaster position="top-center" richColors />
-
           </CartProvider>
         </AuthProvider>
       </body>
