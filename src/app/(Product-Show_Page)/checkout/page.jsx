@@ -24,52 +24,56 @@ export default function CheckoutPage() {
   // Theme ke mutabiq total price calculation
   const totalPrice = cart.reduce((acc, item) => acc + (item.details?.price * item.quantity), 0);
 
-  const handlePlaceOrder = async (e) => {
-    e.preventDefault();
-    if (!session) return toast.error("Please login to place an order");
-    if (cart.length === 0) return toast.error("Aapka cart khali hai!");
+  // handlePlaceOrder function ke andar ye tabdeeli karein:
 
-    setLoading(true);
-    try {
-      const orderPayload = {
-        userId: session?.user?.id,
-        orderItems: cart.map(item => ({
-          name: item.details?.name || "Product Name Missing", 
-          quantity: item.quantity,
-          image: item.details?.images?.[0] || "/placeholder.png",
-          price: item.details?.price || 0,
-          product: item.productId 
-        })),
-        shippingAddress: {
-          address: formData.address,
-          city: formData.city,
-          postalCode: formData.postalCode,
-          country: formData.country
-        },
-        totalPrice: totalPrice,
-        paymentMethod: formData.paymentMethod
-      };
+const handlePlaceOrder = async (e) => {
+  e.preventDefault();
+  
+  // FIX: Login check hata diya taake guest order kar sakay
+  if (cart.length === 0) return toast.error("Aapka cart khali hai!");
 
-      const res = await fetch(API_ENDPOINTS.CHECKOUT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderPayload),
-      });
+  setLoading(true);
+  try {
+    const orderPayload = {
+      // FIX: Agar session hai to ID bhejo, warna null
+      userId: session?.user?.id || null, 
+      orderItems: cart.map(item => ({
+        name: item.details?.name || "Product Name Missing", 
+        quantity: item.quantity,
+        image: item.details?.images?.[0] || "/placeholder.png",
+        price: item.details?.price || 0,
+        product: item.productId 
+      })),
+      shippingAddress: {
+        address: formData.address,
+        city: formData.city,
+        postalCode: formData.postalCode,
+        country: formData.country
+      },
+      totalPrice: totalPrice,
+      paymentMethod: formData.paymentMethod
+    };
 
-      const result = await res.json();
-      if (result.success) {
-        toast.success("Order placed successfully!");
-        clearCart();
-        router.push("/order-success");
-      } else {
-        toast.error(result.message || "Order fail ho gaya");
-      }
-    } catch (error) {
-      toast.error("Server connection issue!");
-    } finally {
-      setLoading(false);
+    const res = await fetch(API_ENDPOINTS.CHECKOUT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderPayload),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      toast.success("Order placed successfully!");
+      clearCart();
+      router.push("/order-success");
+    } else {
+      toast.error(result.message || "Order fail ho gaya");
     }
-  };
+  } catch (error) {
+    toast.error("Server connection issue!");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="bg-[#fcfcfc] min-h-screen pb-20 font-sans text-[#454545]">

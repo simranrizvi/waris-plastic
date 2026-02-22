@@ -57,14 +57,22 @@ export const CartProvider = ({ children }) => {
           : item
       );
     } else {
+      // Product ki saari zaroori info top-level par rakhein taake NaN na aaye
       newCart = [
         ...cart,
-        { productId: product._id, quantity: quantityToAdd, details: product },
+        { 
+          productId: product._id, 
+          quantity: quantityToAdd, 
+          name: product.name,
+          price: product.price,
+          image: product.images?.[0] || product.image,
+          category: product.category,
+          details: product // Backup ke liye
+        },
       ];
     }
     syncCart(newCart);
   };
-
   // 4. Remove from Cart
   const removeFromCart = (productId) => {
     const newCart = cart.filter((item) => item.productId !== productId);

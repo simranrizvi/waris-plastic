@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 
 const OrderSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  // FIX: required hata kar false kar diya taake guest order save ho sakay
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false }, 
   orderItems: [
     {
       name: { type: String, required: true },
